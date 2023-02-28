@@ -33,14 +33,14 @@ This will backup from or on the local machine.
 
 #### Read
 
-```
+```yml
 type: local
 path: /backups
 ```
 
 #### Write
 
-```
+```yml
 type: local
 path: /backups
 user: backup
@@ -53,7 +53,7 @@ This uses an S3 bucket to read from or write to.
 
 #### Read & Write
 
-```
+```yml
 type: bucket
 endpoint: buckets.idrinth.de/test-01
 bucket: test-01

@@ -18,6 +18,9 @@ final class LocalUploader implements Uploader
 
     public function put(string $path, string $data): void
     {
+        if (!$data) {
+            return;
+        }
         $file = $this->path . '/' . $path;
         mkdir(dirname($file), 0700, true);
         file_put_contents($file, $data);

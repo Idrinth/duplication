@@ -1,10 +1,10 @@
 # S3 Duplication
 
-This small script creates backups of files existing in a specific bucket by copiing them over to one or more other buckets. Since this is meant to duplicate backups, changes to files are not checked for.
+This small script creates backups of files existing in a specific bucket or a specific folder via sftp by copying them over to one or more other buckets. Since this is meant to duplicate backups, changes to files are not checked for.
 
 ## Installation
 
-Clone this repository to a mashine you own. Then use `composer install` to install the dependencies.
+Clone this repository to a machine you own. Then use `composer install` to install the dependencies.
 
 ## Configuration
 

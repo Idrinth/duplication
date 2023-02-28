@@ -13,7 +13,9 @@ final class LocalUploader implements Uploader
         $this->path = $path;
         $this->user = $user;
         $this->group = $group;
-        mkdir($this->path, 0777, true);
+        if (!is_dir($this->path)) {
+            mkdir($this->path, 0777, true);
+        }
     }
 
     public function put(string $path, string $data): void

@@ -22,7 +22,9 @@ final class LocalUploader implements Uploader
             return;
         }
         $file = $this->path . '/' . $path;
-        mkdir(dirname($file), 0700, true);
+        if (!is_dir(dirname($file))) {
+            mkdir(dirname($file), 0700, true);
+        }
         file_put_contents($file, $data);
         chgrp($file, $this->group);
         chown($file, $this->user);

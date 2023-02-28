@@ -45,24 +45,31 @@ class BackUp {
         }
         if (!in_array($path, $this->cache[$endpoint])) {
             $this->cache[$endpoint][] = $path;
-            $data = $this->s3s[$endpoint]->getObject(['Bucket' => $bucket, 'Key' => $path]);
+            $data = $this->s3s[$endpoint]->getObject(['Bucket' => $bucket, 'Key' => $path])['Body'];;
             file_put_contents(__DIR__ . '/' . md5($endpoint) . '/' .md5($path), $data);
             return $data;
         }
         return file_get_contents(__DIR__ . '/' . md5($endpoint) . '/' .md5($path));
     }
+    private function getObjectKeys(string $bucket, string $endpoint)
+    {
+        return array_map(
+            function (array $data) {
+                return $data['Key'];
+            },
+            $this->s3s[$endpoint]->listObjectsV2(['Bucket' => $bucket])['Contents'] ?? []
+        );
+    }
     public function run ()
     {
         foreach (Yaml::decodeFromFile(__DIR__ . '/config.yml') as $from) {
             $this->s3s[$from['endpoint']] = $this->s3s[$from['endpoint']] ?? $this->build($from);
-            $originals = array_map(function (array $data) {
-                return $data['Key'];
-            }, $this->s3s[$from['endpoint']]->listObjectsV2(['Bucket' => $from['bucket']])['Contents'] ?? []);
+            $originals = $this->getObjectKeys($from['bucket'], $from['endpoint']);
+            var_dump($originals);
             foreach ($from['targets'] as $target) {
                 $this->s3s[$target['endpoint']] = $this->s3s[$target['endpoint']] ?? $this->build($target);
-                $existing = array_map(function (array $data) {
-                    return $data['Key'];
-                }, $this->s3s[$target['endpoint']]->listObjectsV2(['Bucket' => $target['bucket']])['Contents'] ?? []);
+                $existing = $this->getObjectKeys($target['bucket'], $target['endpoint']);
+                var_dump($existing);
                 foreach (array_diff($originals, $existing) as $missing) {
                     $this->s3s[$target['endpoint']]->putObject([
                         'Bucket' => $target['bucket'],

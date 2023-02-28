@@ -50,7 +50,7 @@ final class S3BucketDownloader implements Downloader
      */
     public function list(): array
     {
-        echo "Getting objects from source {$this->s3->endpoint}\n";
+        echo "Getting objects from source {$this->endpoint}\n";
         $data = array_map(
             function (array $data) {
                 return $data['Key'];

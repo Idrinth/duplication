@@ -1,9 +1,23 @@
-- endpoint: buckets.idrinth.de/test-01
+- type: bucket
+  endpoint: buckets.idrinth.de/test-01
   bucket: test-01
   access-key: abcdefghijklmnopqrstuvwxyz
   secret-access-key: 1234567890
   targets:
   - endpoint: buckets.idrinth.de/test-02
     bucket: test-02
+    access-key: abcdefghijklmnopqrstuvwxyz
+    secret-access-key: 1234567890
+- type: ssh
+  bucket-path: /backups
+  user: rotten
+  ssh-path: /backups
+  host: test-01.idrinth.de
+  password: abcdefghijklmnopqrstuvwxyz
+  private-key: /private/key.pem
+  port: 22
+  targets:
+  - endpoint: buckets.idrinth.de/test-03
+    bucket: test-03
     access-key: abcdefghijklmnopqrstuvwxyz
     secret-access-key: 1234567890

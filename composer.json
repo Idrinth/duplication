@@ -10,6 +10,12 @@
     "require": {
         "aws/aws-sdk-php": "^3.261.0",
         "idrinth/yaml-facade": "^1.2.0",
-        "composer/ca-bundle": "^1.3.5"
+        "composer/ca-bundle": "^1.3.5",
+        "phpseclib/phpseclib": "^3.0.18"
+    },
+    "autoload": {
+        "psr-4": {
+            "De\\Idrinth\\S3Duplication\\": "src"
+        }
     }
 }

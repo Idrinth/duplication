@@ -65,11 +65,9 @@ class BackUp {
         foreach (Yaml::decodeFromFile(__DIR__ . '/config.yml') as $from) {
             $this->s3s[$from['endpoint']] = $this->s3s[$from['endpoint']] ?? $this->build($from);
             $originals = $this->getObjectKeys($from['bucket'], $from['endpoint']);
-            var_dump($originals);
             foreach ($from['targets'] as $target) {
                 $this->s3s[$target['endpoint']] = $this->s3s[$target['endpoint']] ?? $this->build($target);
                 $existing = $this->getObjectKeys($target['bucket'], $target['endpoint']);
-                var_dump($existing);
                 foreach (array_diff($originals, $existing) as $missing) {
                     $this->s3s[$target['endpoint']]->putObject([
                         'Bucket' => $target['bucket'],

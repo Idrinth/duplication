@@ -24,8 +24,8 @@ final class LocalUploader implements Uploader
         $file = $this->path . '/' . $path;
         mkdir(dirname($file), 0700, true);
         file_put_contents($file, $data);
-        chgrp($this->path . $path, $this->group);
-        chown($this->path . $path, $this->user);
+        chgrp($file, $this->group);
+        chown($file, $this->user);
     }
 
     private function scan(string $directory, array &$output): void

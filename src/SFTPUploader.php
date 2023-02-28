@@ -5,21 +5,19 @@ namespace De\Idrinth\S3Duplication;
 use phpseclib3\Crypt\RSA;
 use phpseclib3\Net\SFTP;
 
-final class SFTSDownloader implements Downloader
+final class SFTPUploader implements Uploader
 {
     /**
      * @var string[]
      */
     private array $mapping = [];
-    private FileCache $cache;
     private string $host;
     private string $bucketPath;
     private string $sshPath;
     private SFTP $sftp;
 
-    public function __construct(FileCache $cache, string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password = null)
+    public function __construct(string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password = null)
     {
-        $this->cache = $cache;
         $this->host = $host;
         $this->bucketPath = $bucketPath;
         $this->sshPath = $sshPath;
@@ -37,15 +35,11 @@ final class SFTSDownloader implements Downloader
         );
     }
 
-    public function get($path): string
+    public function put(string $path, string $data): string
     {
         $file = $this->mapping[$path];
-        if (!$this->cache->exists($this->host, $file)) {
-            $data = $this->sftp->get($file);
-            $this->cache->save($this->host, $file, $data);
-            return $data;
-        }
-        return $this->cache->load($this->host, $file);
+        $this->sftp->mkdir(dirname($file), -1, true);
+        $this->sftp->put($file, $data);
     }
 
     public function list(): array

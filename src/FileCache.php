@@ -4,7 +4,11 @@ namespace De\Idrinth\S3Duplication;
 
 final class FileCache
 {
-    private $cache = [];
+    /**
+     * @var string[][]
+     */
+    private array $cache = [];
+
     public function exists(string $identifier, string $file): bool
     {
         if (isset($this->cache[$identifier]) && in_array($file, $this->cache[$identifier])) {

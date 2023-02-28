@@ -4,7 +4,8 @@
   access-key: abcdefghijklmnopqrstuvwxyz
   secret-access-key: 1234567890
   targets:
-  - endpoint: buckets.idrinth.de/test-02
+  - type: bucket
+    endpoint: buckets.idrinth.de/test-02
     bucket: test-02
     access-key: abcdefghijklmnopqrstuvwxyz
     secret-access-key: 1234567890
@@ -17,7 +18,12 @@
   private-key: /private/key.pem
   port: 22
   targets:
-  - endpoint: buckets.idrinth.de/test-03
+  - type: bucket
+    endpoint: buckets.idrinth.de/test-03
     bucket: test-03
     access-key: abcdefghijklmnopqrstuvwxyz
     secret-access-key: 1234567890
+  - type: local
+    path: /backups
+    user: admin
+    group: admin

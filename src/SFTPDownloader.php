@@ -37,7 +37,7 @@ final class SFTPDownloader implements Downloader
         );
     }
 
-    public function get($path): string
+    public function get(string $path): string
     {
         $file = $this->mapping[$path];
         if (!$this->cache->exists($this->host, $file)) {
@@ -48,6 +48,9 @@ final class SFTPDownloader implements Downloader
         return $this->cache->load($this->host, $file);
     }
 
+    /**
+     * @return string[]
+     */
     public function list(): array
     {
         $this->mapping = [];
@@ -57,7 +60,7 @@ final class SFTPDownloader implements Downloader
         }) as $file) {
             $this->mapping[$this->bucketPath . '/' . $file] = $this->sshPath . '/' . $file;
         }
-        echo "Found " . count($this->mapping) . " files.\n";
+        echo "  Found " . count($this->mapping) . " files.\n";
         return array_keys($this->mapping);
     }
 }

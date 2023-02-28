@@ -35,7 +35,7 @@ final class S3BucketDownloader implements Downloader
         $this->bucket = $bucket;
     }
 
-    public function get($path): string
+    public function get(string $path): string
     {
         if (!$this->cache->exists($this->endpoint, $path)) {
             $data = $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'];
@@ -45,6 +45,9 @@ final class S3BucketDownloader implements Downloader
         return $this->cache->load($this->endpoint, $path);
     }
 
+    /**
+     * @return string[]
+     */
     public function list(): array
     {
         echo "Getting objects from source {$this->s3->endpoint}\n";
@@ -54,7 +57,7 @@ final class S3BucketDownloader implements Downloader
             },
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );
-        echo "Found " . count($data) . " files.\n";
+        echo "  Found " . count($data) . " files.\n";
         return $data;
     }
 }

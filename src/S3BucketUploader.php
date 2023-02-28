@@ -5,7 +5,7 @@ namespace De\Idrinth\S3Duplication;
 use Aws\S3\S3Client;
 use Composer\CaBundle\CaBundle;
 
-final class S3BucketUploader
+final class S3BucketUploader implements Uploader
 {
     private S3Client $s3;
     private string $endpoint;
@@ -33,7 +33,7 @@ final class S3BucketUploader
         $this->endpoint = $endpoint;
     }
 
-    public function put($path, $data): void
+    public function put(string $path, string $data): void
     {
        $this->s3->putObject([
             'Bucket' => $this->bucket,
@@ -45,11 +45,13 @@ final class S3BucketUploader
     public function list(): array
     {
         echo "  Getting objects from target {$this->endpoint}\n";
-        return array_map(
+        $data = array_map(
             function (array $data) {
                 return $data['Key'];
             },
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );
+        echo "    Found " . count($data) . " objects.\n";
+        return $data;
     }
 }

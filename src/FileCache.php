@@ -24,7 +24,9 @@ final class FileCache
     {
         $this->cache[$identifier] = $this->cache[$identifier] ?? [];
         $this->cache[$identifier][] = $file;
-        mkdir(dirname(__DIR__) . '/cache/' . md5($identifier), 0777, true);
+        if (!is_dir(dirname(__DIR__) . '/cache/' . md5($identifier))) {
+            mkdir(dirname(__DIR__) . '/cache/' . md5($identifier), 0777, true);
+        }
         file_put_contents(dirname(__DIR__) . '/cache/' . md5($identifier) . '/' . md5($file), $data);
     }
     public function __destruct()

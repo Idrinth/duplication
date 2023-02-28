@@ -1,0 +1,15 @@
+{
+    "name": "idrinth/s3-duplication",
+    "description": "Duplicate code from a source s3 storage to one or more target s3 storages.",
+    "authors": [
+        {
+            "name": "Björn Büttner",
+            "homepage": "https://github.com/idrinth"
+        }
+    ],
+    "require": {
+        "aws/aws-sdk-php": "^3.261.0",
+        "idrinth/yaml-facade": "^1.2.0",
+        "composer/ca-bundle": "^1.3.5"
+    }
+}

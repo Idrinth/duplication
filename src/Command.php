@@ -26,7 +26,7 @@ final class Command
             case 'ssh':
                 return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password']);
             case 'bucket':
-                return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['access-key'], $downloader['secret-access-key']);
+                return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key']);
             case 'local':
                 return new LocalDownloader($downloader['path']);
             default:

@@ -48,7 +48,7 @@ user: backup
 group: backup
 ```
 
-### Type Bucket (default)
+### Type Bucket
 
 This uses an S3 bucket to read from or write to.
 

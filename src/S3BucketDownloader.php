@@ -1,6 +1,6 @@
 <?php
 
-namespace De\Idrinth\S3Duplication;
+namespace De\Idrinth\Duplication;
 
 use Aws\S3\S3Client;
 use Composer\CaBundle\CaBundle;

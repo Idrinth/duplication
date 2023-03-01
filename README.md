@@ -36,6 +36,7 @@ This will backup from or on the local machine.
 ```yml
 type: local
 path: /backups
+prefix: mine
 ```
 
 #### Write

@@ -1,14 +1,15 @@
 <?php
 
-namespace De\Idrinth\S3Duplication;
+namespace De\Idrinth\Duplication;
 
 final class LocalDownloader implements Downloader
 {
     private string $path;
 
-    public function __construct(string $path)
+    public function __construct(string $path, ?string $prefix = null)
     {
         $this->path = $path;
+        $this->prefix = $prefix ?: basename($path);
     }
 
     public function get(string $path): string
@@ -25,7 +26,7 @@ final class LocalDownloader implements Downloader
             if (is_dir($directory . '/' . $file)) {
                 $this->scan($directory . '/' . $file, $output);
             } else {
-                $output[] = preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file);
+                $output[] = $this->prefix . '/' . preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file);
             }
         }
     }

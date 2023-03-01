@@ -1,5 +1,5 @@
 {
-    "name": "idrinth/s3-duplication",
+    "name": "idrinth/duplication",
     "description": "Duplicate code from a source s3 storage to one or more target s3 storages.",
     "authors": [
         {
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "De\\Idrinth\\S3Duplication\\": "src"
+            "De\\Idrinth\\Duplication\\": "src"
         }
     }
 }

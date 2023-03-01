@@ -1,6 +1,6 @@
 <?php
 
-namespace De\Idrinth\S3Duplication;
+namespace De\Idrinth\Duplication;
 
 use De\Idrinth\Yaml\Yaml;
 use InvalidArgumentException;
@@ -28,7 +28,7 @@ final class Command
             case 'bucket':
                 return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key']);
             case 'local':
-                return new LocalDownloader($downloader['path']);
+                return new LocalDownloader($downloader['path'], $downloader['prefix'] ?? null);
             default:
                 throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported.");
         }

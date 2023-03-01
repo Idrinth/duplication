@@ -1,6 +1,6 @@
 <?php
 
-namespace De\Idrinth\S3Duplication;
+namespace De\Idrinth\Duplication;
 
 interface Uploader
 {

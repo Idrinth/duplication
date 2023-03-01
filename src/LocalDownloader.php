@@ -14,7 +14,7 @@ final class LocalDownloader implements Downloader
 
     public function get(string $path): string
     {
-        return file_get_contents($this->path . $path) ?: '';
+        return file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix, '/') . '/', '', $path)) ?: '';
     }
 
     private function scan(string $directory, array &$output): void
@@ -26,7 +26,7 @@ final class LocalDownloader implements Downloader
             if (is_dir($directory . '/' . $file)) {
                 $this->scan($directory . '/' . $file, $output);
             } else {
-                $output[] = $this->prefix . '/' . preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file);
+                $output[] = $this->prefix . '/' . ltrim(preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file), '/');
             }
         }
     }

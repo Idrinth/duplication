@@ -1,4 +1,4 @@
-# S3 Duplication
+# Duplication
 
 This small script creates backups of files existing in a specific location by copying them to to one or more other locations. Since this is meant to duplicate backups, changes to files are not checked for. All remote file reads are cached locally to minimize traffic while the script runs.
 

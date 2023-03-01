@@ -9,7 +9,7 @@ final class Command
 {
     private function getUploader(array $uploader): Uploader
     {
-        switch ($uploader['type'] ?? 'bucket') {
+        switch ($uploader['type'] ?? '') {
             case 'ssh':
                 return new SFTPUploader($uploader['host'], $uploader['bucketPath'], $uploader['sshPath'], $uploader['port'], $uploader['user'], $uploader['privateKey'], $uploader['password']);
             case 'local':
@@ -17,12 +17,12 @@ final class Command
             case 'bucket':
                 return new S3BucketUploader($uploader['bucket'], $uploader['endpoint'], $uploader['access-key'], $uploader['secret-access-key']);
             default:
-                throw InvalidArgumentException("{$uploader['type']} is unknown and unsupported.");
+                throw InvalidArgumentException("{$uploader['type']} is unknown and unsupported: " . json_encode($uploader));
         }
     }
     private function getDownloader(array $downloader, FileCache $cache): Downloader
     {
-        switch ($downloader['type'] ?? 'bucket') {
+        switch ($downloader['type'] ?? '') {
             case 'ssh':
                 return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password']);
             case 'bucket':
@@ -30,7 +30,7 @@ final class Command
             case 'local':
                 return new LocalDownloader($downloader['path'], $downloader['prefix'] ?? null);
             default:
-                throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported.");
+                throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported: " . json_encode($downloader));
         }
     }
     public function run ()

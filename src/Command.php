@@ -22,7 +22,7 @@ final class Command
     }
     private function getDownloader(array $downloader, FileCache $cache): Downloader
     {
-        switch ($downloader['case'] ?? 'bucket') {
+        switch ($downloader['type'] ?? 'bucket') {
             case 'ssh':
                 return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password']);
             case 'bucket':

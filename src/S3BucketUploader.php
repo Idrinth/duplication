@@ -48,7 +48,7 @@ final class S3BucketUploader implements Uploader
         echo "  Getting objects from target {$this->endpoint}\n";
         $data = array_map(
             function (array $data) {
-                return $data['Key'];
+                return ltrim($data['Key'], '/');
             },
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );

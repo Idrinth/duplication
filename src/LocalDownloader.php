@@ -27,7 +27,7 @@ final class LocalDownloader implements Downloader
     {
         echo "  Downloading $path.\n";
         if (!$this->cache->exists($this->path, $path)) {
-            $data = $this->encrypter(file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '', $this->encrypt);
+            $data = $this->encrypter->encrypt(file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '', $this->encrypt);
             $this->cache->save($this->path, $path, $data);
             return $data;
         }

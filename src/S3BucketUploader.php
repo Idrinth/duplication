@@ -53,7 +53,7 @@ final class S3BucketUploader implements Uploader
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );
         $data = array_filter($data, function ($file) {
-            if (substr($file, -1) === '/.') {
+            if (substr($file, -2) === '/.' || substr($file, -1) === '/') {
                 return false;
             }
             return true;

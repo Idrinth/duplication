@@ -48,6 +48,11 @@ final class Command
     }
     public function run ()
     {
+        $pid = dirname(__DIR__) . '/running';
+        if (is_file($pid)) {
+            return;
+        }
+        touch($pid);
         if (function_exists('gc_enable')) {
             gc_enable();
         }
@@ -59,5 +64,6 @@ final class Command
                 $this->syncFiles($this->getUploader($target), $downloader, $originals);
             }
         }
+        unlink($pid);
     }
 }

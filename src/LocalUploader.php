@@ -43,7 +43,7 @@ final class LocalUploader implements Uploader
             if (is_dir($directory . '/' . $file)) {
                 $this->scan($directory . '/' . $file, $output);
             } else {
-                $output[] = preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file);
+                $output[] = ltrim(preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file), '/');
             }
         }
     }

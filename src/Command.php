@@ -24,11 +24,11 @@ final class Command
     {
         switch ($downloader['type'] ?? '') {
             case 'ssh':
-                return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password']);
+                return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password'], $downloader['force-date-prefix'] ?? false);
             case 'bucket':
-                return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key']);
+                return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key'], $downloader['force-date-prefix'] ?? false);
             case 'local':
-                return new LocalDownloader($downloader['path'], $downloader['prefix'] ?? null);
+                return new LocalDownloader($downloader['path'], $downloader['prefix'] ?? null, $downloader['force-date-prefix'] ?? false);
             default:
                 throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported: " . json_encode($downloader));
         }

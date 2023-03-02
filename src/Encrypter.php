@@ -13,7 +13,7 @@ class Encrypter
     {
         $file = dirname(__DIR__) . '/public.key';
         if (is_file($file) && is_readable($file)) {
-            $this->key = RSA::loadPublicKey($file);
+            $this->key = RSA::loadPublicKey(file_get_contents($file));
         }
     }
     public function encrypt(string $data, bool $encrypt): string

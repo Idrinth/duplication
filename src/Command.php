@@ -28,7 +28,7 @@ final class Command
             case 'bucket':
                 return new S3BucketDownloader($encrypter, $cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key'], $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
             case 'local':
-                return new LocalDownloader($encrypter, $cache, $downloader['path'], $downloader['prefix'] ?? null, $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
+                return new LocalDownloader($encrypter, $cache, $downloader['path'], $downloader['prefix'] ?? '', $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
             default:
                 throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported: " . json_encode($downloader));
         }

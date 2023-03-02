@@ -41,14 +41,14 @@ final class Command
     {
         foreach (array_diff($originals, $uploader->list()) as $missing) {
             $this->sync($uploader, $downloader, $missing);
-            if (is_function('gc_collect_cycles')) {
+            if (function_exists('gc_collect_cycles')) {
                 gc_collect_cycles();
             }
         }
     }
     public function run ()
     {
-        if (is_function('gc_enable')) {
+        if (function_exists('gc_enable')) {
             gc_enable();
         }
         $cache = new FileCache();

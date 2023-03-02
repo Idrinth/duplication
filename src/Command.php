@@ -41,7 +41,7 @@ final class Command
             $originals = $downloader->list();
             foreach (($from['targets'] ?? []) as $target) {
                 $uploader = $this->getUploader($target);
-                var_dump($originals, $uploader->list(), array_diff($originals, $uploader->list()));
+                var_dump(array_diff($originals, $uploader->list()));
                 die;
                 foreach (array_diff($originals, $uploader->list()) as $missing) {
                     $uploader->put($missing, $downloader->get($missing));

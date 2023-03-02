@@ -13,7 +13,7 @@ class Encrypter
         $this->key = new AES('ctr');
         $this->key->setIV($_ENV['ENCRYPTION_AES_IV']);
         $this->key->setKeyLength(intval($_ENV['ENCRYPTION_AES_LENGTH'], 10));
-        $this->key->setKey($_ENV['ENCRYPTION_AES_IV']);
+        $this->key->setKey($_ENV['ENCRYPTION_AES_KEY']);
     }
     public function encrypt(string $data, bool $encrypt): string
     {

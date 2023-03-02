@@ -73,7 +73,7 @@ endpoint: buckets.idrinth.de/test-01
 bucket: test-01
 access-key: abcdefghijklmnopqrstuvwxyz
 secret-access-key: 1234567890
-force-data-prefix: false
+force-date-prefix: false
 ```
 
 #### Write

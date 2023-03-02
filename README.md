@@ -14,8 +14,20 @@ Please copy the supplied config.example.yml to config.yml and adjust the values 
 
 This will use sftp to connect to a server. This can be used for upload and download.
 
-#### Read & Write
+#### Read
 
+```yml
+type: ssh
+bucket-path: /backups
+user: rotten
+ssh-path: /backups
+host: test-01.idrinth.de
+password: abcdefghijklmnopqrstuvwxyz
+private-key: /private/key.pem
+port: 22
+force-date-prefix: false
+```
+#### Write
 ```yml
 type: ssh
 bucket-path: /backups
@@ -37,6 +49,7 @@ This will backup from or on the local machine.
 type: local
 path: /backups
 prefix: mine
+force-date-prefix: false
 ```
 
 #### Write
@@ -52,7 +65,18 @@ group: backup
 
 This uses an S3 bucket to read from or write to.
 
-#### Read & Write
+#### Read
+
+```yml
+type: bucket
+endpoint: buckets.idrinth.de/test-01
+bucket: test-01
+access-key: abcdefghijklmnopqrstuvwxyz
+secret-access-key: 1234567890
+force-data-prefix: false
+```
+
+#### Write
 
 ```yml
 type: bucket

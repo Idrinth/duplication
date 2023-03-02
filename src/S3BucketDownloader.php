@@ -11,8 +11,9 @@ final class S3BucketDownloader implements Downloader
     private FileCache $cache;
     private string $endpoint;
     private string $bucket;
+    private string $datePrefix = '';
 
-    public function __construct(FileCache $cache, string $endpoint, string $bucket, string $accessKey, string $secretAccessKey)
+    public function __construct(FileCache $cache, string $endpoint, string $bucket, string $accessKey, string $secretAccessKey, bool $forceDatePrefix = true)
     {
         $this->s3 = new S3Client([
             'service' => 's3',
@@ -33,10 +34,16 @@ final class S3BucketDownloader implements Downloader
         $this->cache = $cache;
         $this->endpoint = $endpoint;
         $this->bucket = $bucket;
+        if ($forceDatePrefix) {
+            $this->datePrefix = date('Y-m-d') . '/';
+        }
     }
 
     public function get(string $path): string
     {
+        if ($this->datePrefix) {
+            $path = preg_replace('/^' . preg_quote($this->datePrefix, '/') . '/', '', $path);
+        }
         echo "  Downloading $path.\n";
         if (!$this->cache->exists($this->endpoint, $path)) {
             $data = $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'];
@@ -64,6 +71,9 @@ final class S3BucketDownloader implements Downloader
             }
             return true;
         });
+        $data = array_map(function ($path) {
+            return  $this->datePrefix . $path;
+        }, $data);
         echo "  Found " . count($data) . " files.\n";
         return $data;
     }

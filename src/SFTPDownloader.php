@@ -16,8 +16,9 @@ final class SFTPDownloader implements Downloader
     private string $bucketPath;
     private string $sshPath;
     private SFTP $sftp;
+    private string $datePrefix = '';
 
-    public function __construct(FileCache $cache, string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password = null)
+    public function __construct(FileCache $cache, string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password = null, bool $forceDatePrefix = false)
     {
         $this->cache = $cache;
         $this->host = $host;
@@ -35,6 +36,9 @@ final class SFTPDownloader implements Downloader
             $user,
             RSA::loadPrivateKey(file_get_contents($privateKey), $password)
         );
+        if ($forceDatePrefix) {
+            $this->datePrefix = date('Y-m-d') . '/';
+        }
     }
 
     public function get(string $path): string
@@ -59,7 +63,7 @@ final class SFTPDownloader implements Downloader
         foreach (array_filter($this->sftp->nlist($this->sshPath, true), function ($file) {
             return $file !== '.' && $file !== '..' && substr($file, -2) !== '/.' && substr($file, -3) !== '/..';
         }) as $file) {
-            $this->mapping[$this->bucketPath . '/' . $file] = $this->sshPath . '/' . $file;
+            $this->mapping[$this->bucketPath . '/' . $this->datePrefix . $file] = $this->sshPath . '/' . $file;
         }
         echo "  Found " . count($this->mapping) . " files.\n";
         return array_keys($this->mapping);

@@ -7,9 +7,15 @@ final class LocalDownloader implements Downloader
     private string $path;
     private string $prefix = '';
     private string $datePrefix = '';
+    private Encrypter $encrypter;
+    private FileCache $cache;
+    private bool $encrypt;
 
-    public function __construct(string $path, ?string $prefix = null, bool $forceDatePrefix=false)
+    public function __construct(Encrypter $encrypter, FileCache $cache, string $path, string $prefix, bool $forceDatePrefix, bool $encrypt)
     {
+        $this->encrypt = $encrypt;
+        $this->encrypter = $encrypter;
+        $this->cache = $cache;
         $this->path = $path;
         $this->prefix = $prefix ?: basename($path);
         if ($forceDatePrefix) {
@@ -20,7 +26,12 @@ final class LocalDownloader implements Downloader
     public function get(string $path): string
     {
         echo "  Downloading $path.\n";
-        return file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '';
+        if (!$this->cache->exists($this->path, $path)) {
+            $data = $this->encrypter(file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '', $this->encrypt);
+            $this->cache->save($this->path, $path, $data);
+            return $data;
+        }
+        return $this->cache->load($this->path, $path);
     }
 
     private function scan(string $directory, array &$output): void

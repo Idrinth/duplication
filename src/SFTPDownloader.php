@@ -12,14 +12,18 @@ final class SFTPDownloader implements Downloader
      */
     private array $mapping = [];
     private FileCache $cache;
+    private Encrypter $encrypter;
     private string $host;
     private string $bucketPath;
     private string $sshPath;
     private SFTP $sftp;
     private string $datePrefix = '';
+    private bool $encrypt;
 
-    public function __construct(FileCache $cache, string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password = null, bool $forceDatePrefix = false)
+    public function __construct(Encrypter $encrypter, FileCache $cache, string $host, string $bucketPath, string $sshPath, int $port, string $user, string $privateKey, ?string $password, bool $forceDatePrefix, bool $encrypt)
     {
+        $this->encrypter = $encrypter;
+        $this->encrypt = $encrypt;
         $this->cache = $cache;
         $this->host = $host;
         $this->bucketPath = $bucketPath;
@@ -46,7 +50,7 @@ final class SFTPDownloader implements Downloader
         $file = $this->mapping[$path];
         echo "  Downloading $file.\n";
         if (!$this->cache->exists($this->host, $file)) {
-            $data = $this->sftp->get($file);
+            $data = $this->encrypter->encrypt($this->sftp->get($file), $this->encrypt);
             $this->cache->save($this->host, $file, $data);
             return $data;
         }

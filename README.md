@@ -26,6 +26,7 @@ password: abcdefghijklmnopqrstuvwxyz
 private-key: /private/key.pem
 port: 22
 force-date-prefix: false
+encrypt-with-public-key: true
 ```
 #### Write
 ```yml
@@ -50,6 +51,7 @@ type: local
 path: /backups
 prefix: mine
 force-date-prefix: false
+encrypt-with-public-key: true
 ```
 
 #### Write
@@ -74,6 +76,7 @@ bucket: test-01
 access-key: abcdefghijklmnopqrstuvwxyz
 secret-access-key: 1234567890
 force-date-prefix: false
+encrypt-with-public-key: true
 ```
 
 #### Write

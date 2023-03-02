@@ -9,12 +9,16 @@ final class S3BucketDownloader implements Downloader
 {
     private S3Client $s3;
     private FileCache $cache;
+    private Encrypter $encrypter;
     private string $endpoint;
     private string $bucket;
     private string $datePrefix = '';
+    private bool $encrypt;
 
-    public function __construct(FileCache $cache, string $endpoint, string $bucket, string $accessKey, string $secretAccessKey, bool $forceDatePrefix = true)
+    public function __construct(Encrypter $encrypter, FileCache $cache, string $endpoint, string $bucket, string $accessKey, string $secretAccessKey, bool $forceDatePrefix, bool $encrypt)
     {
+        $this->encrypt = $encrypt;
+        $this->encrypter = $encrypter;
         $this->s3 = new S3Client([
             'service' => 's3',
             'region' => 'other',
@@ -46,7 +50,7 @@ final class S3BucketDownloader implements Downloader
         }
         echo "  Downloading $path.\n";
         if (!$this->cache->exists($this->endpoint, $path)) {
-            $data = $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'];
+            $data = $this->encrypter->encrypt($this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'], $this->encrypt);
             $this->cache->save($this->endpoint, $path, $data);
             return $data;
         }

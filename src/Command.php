@@ -20,15 +20,15 @@ final class Command
                 throw InvalidArgumentException("{$uploader['type']} is unknown and unsupported: " . json_encode($uploader));
         }
     }
-    private function getDownloader(array $downloader, FileCache $cache): Downloader
+    private function getDownloader(array $downloader, Encrypter $encrypter, FileCache $cache): Downloader
     {
         switch ($downloader['type'] ?? '') {
             case 'ssh':
-                return new SFTPDownloader($cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password'], $downloader['force-date-prefix'] ?? false);
+                return new SFTPDownloader($encrypter, $cache, $downloader['host'], $downloader['bucket-path'], $downloader['ssh-path'], $downloader['port'], $downloader['user'], $downloader['private-key'], $downloader['password'] ?? null, $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
             case 'bucket':
-                return new S3BucketDownloader($cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key'], $downloader['force-date-prefix'] ?? false);
+                return new S3BucketDownloader($encrypter, $cache, $downloader['endpoint'], $downloader['bucket'], $downloader['access-key'], $downloader['secret-access-key'], $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
             case 'local':
-                return new LocalDownloader($downloader['path'], $downloader['prefix'] ?? null, $downloader['force-date-prefix'] ?? false);
+                return new LocalDownloader($encrypter, $downloader['path'], $downloader['prefix'] ?? null, $downloader['force-date-prefix'] ?? false, $downloader['encrypt-with-public-key'] ?? false);
             default:
                 throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported: " . json_encode($downloader));
         }
@@ -57,8 +57,9 @@ final class Command
             gc_enable();
         }
         $cache = new FileCache();
+        $encrypter = new Encrypter();
         foreach (Yaml::decodeFromFile(__DIR__ . '/../config.yml') as $from) {
-            $downloader = $this->getDownloader($from, $cache);
+            $downloader = $this->getDownloader($from, $encrypter, $cache);
             $originals = $downloader->list();
             foreach (($from['targets'] ?? []) as $target) {
                 $this->syncFiles($this->getUploader($target), $downloader, $originals);

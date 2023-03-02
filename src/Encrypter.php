@@ -2,15 +2,18 @@
 
 namespace De\Idrinth\Duplication;
 
+use phpseclib3\Crypt\RSA;
+use phpseclib3\Crypt\RSA\PublicKey;
+
 class Encrypter
 {
-    private string $key;
+    private ?PublicKey $key = null;
 
     public function __construct()
     {
         $file = dirname(__DIR__) . '/public.key';
         if (is_file($file) && is_readable($file)) {
-            $this->key = substr(file_get_contents($file) ?: '', 8) ?: '';
+            $this->key = RSA::loadPublicKey($file);
         }
     }
     public function encrypt(string $data, bool $encrypt): string
@@ -18,12 +21,6 @@ class Encrypter
         if (!$encrypt || !$this->key) {
             return $data;
         }
-        return openssl_encrypt(
-            $data,
-            $_ENV['SSL_ALGORYTHM'],
-            $this->key,
-            OPENSSL_RAW_DATA,
-            $_ENV['SSL_INITILIZATION_VECTOR']
-        );
+        return $this->key->encrypt($data) ?: '';
     }
 }

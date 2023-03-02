@@ -37,6 +37,7 @@ final class SFTPUploader implements Uploader
 
     public function put(string $path, string $data): string
     {
+        echo "  Uploading $path.\n";
         $file = $this->mapping[$path];
         $this->sftp->mkdir(dirname($file), -1, true);
         $this->sftp->put($file, $data);

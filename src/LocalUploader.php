@@ -23,6 +23,7 @@ final class LocalUploader implements Uploader
         if (!$data) {
             return;
         }
+        echo "  Uploading $path.\n";
         $file = $this->path . '/' . ltrim($path, '/');
         $dir = dirname($file);
         if (!is_dir($dir)) {

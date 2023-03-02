@@ -35,6 +35,7 @@ final class S3BucketUploader implements Uploader
 
     public function put(string $path, string $data): void
     {
+       echo "  Uploading $path.\n";
        $this->s3->putObject([
             'Bucket' => $this->bucket,
             'Key' => ltrim($path, '/'),

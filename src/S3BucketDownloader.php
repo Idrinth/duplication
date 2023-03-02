@@ -37,6 +37,7 @@ final class S3BucketDownloader implements Downloader
 
     public function get(string $path): string
     {
+        echo "  Downloading $path.\n";
         if (!$this->cache->exists($this->endpoint, $path)) {
             $data = $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'];
             $this->cache->save($this->endpoint, $path, $data);

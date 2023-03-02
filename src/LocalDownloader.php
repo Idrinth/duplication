@@ -14,6 +14,7 @@ final class LocalDownloader implements Downloader
 
     public function get(string $path): string
     {
+        echo "  Downloading $path.\n";
         return file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix, '/') . '/', '', $path)) ?: '';
     }
 

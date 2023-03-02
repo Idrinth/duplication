@@ -40,6 +40,7 @@ final class SFTPDownloader implements Downloader
     public function get(string $path): string
     {
         $file = $this->mapping[$path];
+        echo "  Downloading $file.\n";
         if (!$this->cache->exists($this->host, $file)) {
             $data = $this->sftp->get($file);
             $this->cache->save($this->host, $file, $data);

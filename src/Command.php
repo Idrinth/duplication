@@ -33,17 +33,30 @@ final class Command
                 throw InvalidArgumentException("{$downloader['type']} is unknown and unsupported: " . json_encode($downloader));
         }
     }
+    private function sync(Uploader $uploader, Downloader $downloader, string $path): void
+    {
+        $uploader->put($path, $downloader->get($path));
+    }
+    private function syncFiles(Uploader $uploader, Downloader $downloader, array $originals): void
+    {
+        foreach (array_diff($originals, $uploader->list()) as $missing) {
+            $this->sync($uploader, $downloader, $missing);
+            if (is_function('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+        }
+    }
     public function run ()
     {
+        if (is_function('gc_enable')) {
+            gc_enable();
+        }
         $cache = new FileCache();
         foreach (Yaml::decodeFromFile(__DIR__ . '/../config.yml') as $from) {
             $downloader = $this->getDownloader($from, $cache);
             $originals = $downloader->list();
             foreach (($from['targets'] ?? []) as $target) {
-                $uploader = $this->getUploader($target);
-                foreach (array_diff($originals, $uploader->list()) as $missing) {
-                    $uploader->put($missing, $downloader->get($missing));
-                }
+                $this->syncFiles($this->getUploader($target), $downloader, $originals);
             }
         }
     }

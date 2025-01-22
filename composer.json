@@ -1,6 +1,9 @@
 {
     "name": "idrinth/duplication",
-    "description": "Duplicate code from a source s3 storage to one or more target s3 storages.",
+    "description": "Duplicate data from a source to one or more targets to back it up.",
+    "keywords": [
+        "backup"
+    ],
     "authors": [
         {
             "name": "Björn Büttner",
@@ -23,7 +26,6 @@
             "php bin/setup.php"
         ]
     },
-    "bin": "bin/duplicate.php",
     "autoload": {
         "psr-4": {
             "De\\Idrinth\\Duplication\\": "src"

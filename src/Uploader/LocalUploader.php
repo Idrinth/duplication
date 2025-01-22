@@ -1,18 +1,18 @@
 <?php
 
-namespace De\Idrinth\Duplication;
+namespace De\Idrinth\Duplication\Uploader;
 
-final class LocalUploader implements Uploader
+use De\Idrinth\Duplication\Logger;
+use De\Idrinth\Duplication\Uploader;
+
+final readonly class LocalUploader implements Uploader
 {
-    private string $path;
-    private string $user;
-    private string $group;
-    
-    public function __construct(string $path, string $user, string $group)
-    {
-        $this->path = $path;
-        $this->user = $user;
-        $this->group = $group;
+    public function __construct(
+        private Logger $logger,
+        private string $path,
+        private string $user,
+        private string $group
+    ) {
         if (!is_dir($this->path)) {
             mkdir($this->path, 0777, true);
         }
@@ -23,7 +23,7 @@ final class LocalUploader implements Uploader
         if (!$data) {
             return;
         }
-        echo "  Uploading $path.\n";
+        $this->logger->info("Uploading $path.");
         $file = $this->path . '/' . ltrim($path, '/');
         $dir = dirname($file);
         if (!is_dir($dir)) {
@@ -50,10 +50,10 @@ final class LocalUploader implements Uploader
 
     public function list(): array
     {
-        echo "  Getting objects from target {$this->path}\n";
+        $this->logger->info("Getting objects from target $this->path");
         $output = [];
         $this->scan($this->path, $output);
-        echo "    Found " . count($output) . " objects.\n";
+        $this->logger->info("Found " . count($output) . " objects.");
         return $output;
     }
 }

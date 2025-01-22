@@ -42,7 +42,7 @@ port: 22
 
 ### Type Local
 
-This will backup from or on the local machine.
+This will back up from or on the local machine.
 
 #### Read
 

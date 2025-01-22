@@ -1,18 +1,23 @@
 <?php
 
-namespace De\Idrinth\Duplication;
+namespace De\Idrinth\Duplication\Uploader;
 
 use Aws\S3\S3Client;
 use Composer\CaBundle\CaBundle;
+use De\Idrinth\Duplication\Logger;
+use De\Idrinth\Duplication\Uploader;
 
-final class S3BucketUploader implements Uploader
+final readonly class S3BucketUploader implements Uploader
 {
     private S3Client $s3;
-    private string $endpoint;
-    private string $bucket;
 
-    public function __construct(string $bucket, string $endpoint, string $accessKey, string $secretAccessKey)
-    {
+    public function __construct(
+        private Logger $logger,
+        private string $bucket,
+        private string $endpoint,
+        string $accessKey,
+        string $secretAccessKey
+    ) {
         $this->s3 = new S3Client([
             'service' => 's3',
             'region' => 'other',
@@ -29,13 +34,11 @@ final class S3BucketUploader implements Uploader
                 'verify' => CaBundle::getBundledCaBundlePath(),
             ],
         ]);
-        $this->bucket = $bucket;
-        $this->endpoint = $endpoint;
     }
 
     public function put(string $path, string $data): void
     {
-       echo "  Uploading $path.\n";
+       $this->logger->info("Uploading $path.");
        $this->s3->putObject([
             'Bucket' => $this->bucket,
             'Key' => ltrim($path, '/'),
@@ -45,7 +48,7 @@ final class S3BucketUploader implements Uploader
 
     public function list(): array
     {
-        echo "  Getting objects from target {$this->endpoint}\n";
+        $this->logger->info("Getting objects from target $this->endpoint");
         $data = array_map(
             function (array $data) {
                 return ltrim($data['Key'], '/');
@@ -53,12 +56,9 @@ final class S3BucketUploader implements Uploader
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );
         $data = array_filter($data, function ($file) {
-            if (substr($file, -2) === '/.' || substr($file, -1) === '/') {
-                return false;
-            }
-            return true;
+            return !str_ends_with($file, '/.') && !str_ends_with($file, '/');
         });
-        echo "    Found " . count($data) . " objects.\n";
+        $this->logger->info("Found " . count($data) . " objects.");
         return $data;
     }
 }

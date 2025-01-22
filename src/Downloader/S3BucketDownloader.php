@@ -1,24 +1,33 @@
 <?php
 
-namespace De\Idrinth\Duplication;
+namespace De\Idrinth\Duplication\Downloader;
 
 use Aws\S3\S3Client;
 use Composer\CaBundle\CaBundle;
+use De\Idrinth\Duplication\Cache;
+use De\Idrinth\Duplication\Downloader;
+use De\Idrinth\Duplication\Encrypter;
+use De\Idrinth\Duplication\Logger;
 
 final class S3BucketDownloader implements Downloader
 {
     private S3Client $s3;
-    private FileCache $cache;
-    private Encrypter $encrypter;
-    private string $endpoint;
-    private string $bucket;
     private string $datePrefix = '';
     private bool $encrypt;
 
-    public function __construct(Encrypter $encrypter, FileCache $cache, string $endpoint, string $bucket, string $accessKey, string $secretAccessKey, bool $forceDatePrefix, bool $encrypt)
-    {
+    public function __construct(
+        private readonly Logger $logger,
+        private readonly Encrypter $encrypter,
+        private readonly Cache $cache,
+        bool $hasMultipleDailyBackups,
+        private readonly string $endpoint,
+        private readonly string $bucket,
+        string $accessKey,
+        string $secretAccessKey,
+        bool $forceDatePrefix,
+        bool $encrypt
+    ) {
         $this->encrypt = $encrypt;
-        $this->encrypter = $encrypter;
         $this->s3 = new S3Client([
             'service' => 's3',
             'region' => 'other',
@@ -35,11 +44,8 @@ final class S3BucketDownloader implements Downloader
                 'verify' => CaBundle::getBundledCaBundlePath(),
             ],
         ]);
-        $this->cache = $cache;
-        $this->endpoint = $endpoint;
-        $this->bucket = $bucket;
         if ($forceDatePrefix) {
-            $this->datePrefix = date('Y-m-d') . '/';
+            $this->datePrefix = date('Y-m-d') . ($hasMultipleDailyBackups ? date('-H') : '') . '/';
         }
     }
 
@@ -48,9 +54,12 @@ final class S3BucketDownloader implements Downloader
         if ($this->datePrefix) {
             $path = preg_replace('/^' . preg_quote($this->datePrefix, '/') . '/', '', $path);
         }
-        echo "  Downloading $path.\n";
+        $this->logger->info("Downloading $path.");
         if (!$this->cache->exists($this->endpoint, $path)) {
-            $data = $this->encrypter->encrypt($this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'], $this->encrypt);
+            $data = $this->encrypter->encrypt(
+                $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'],
+                $this->encrypt
+            );
             $this->cache->save($this->endpoint, $path, $data);
             return $data;
         }
@@ -62,7 +71,7 @@ final class S3BucketDownloader implements Downloader
      */
     public function list(): array
     {
-        echo "Getting objects from source {$this->endpoint}\n";
+        $this->logger->info("Getting objects from source $this->endpoint");
         $data = array_map(
             function (array $data) {
                 return ltrim($data['Key'], '/');
@@ -70,15 +79,12 @@ final class S3BucketDownloader implements Downloader
             $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
         );
         $data = array_filter($data, function ($file) {
-            if (substr($file, -2) === '/.' || substr($file, -1) === '/') {
-                return false;
-            }
-            return true;
+            return !str_ends_with($file, '/.') && !str_ends_with($file, '/');
         });
         $data = array_map(function ($path) {
             return  $this->datePrefix . $path;
         }, $data);
-        echo "  Found " . count($data) . " files.\n";
+        $this->logger->info("Found " . count($data) . " files.");
         return $data;
     }
 }

@@ -1,33 +1,41 @@
 <?php
 
-namespace De\Idrinth\Duplication;
+namespace De\Idrinth\Duplication\Downloader;
+
+use De\Idrinth\Duplication\Cache;
+use De\Idrinth\Duplication\Downloader;
+use De\Idrinth\Duplication\Encrypter;
+use De\Idrinth\Duplication\Logger;
 
 final class LocalDownloader implements Downloader
 {
-    private string $path;
     private string $prefix = '';
     private string $datePrefix = '';
-    private Encrypter $encrypter;
-    private FileCache $cache;
-    private bool $encrypt;
 
-    public function __construct(Encrypter $encrypter, FileCache $cache, string $path, string $prefix, bool $forceDatePrefix, bool $encrypt)
-    {
-        $this->encrypt = $encrypt;
-        $this->encrypter = $encrypter;
-        $this->cache = $cache;
-        $this->path = $path;
+    public function __construct(
+        private readonly Logger $logger,
+        private readonly Encrypter $encrypter,
+        private readonly Cache $cache,
+        bool $hasMultipleDailyBackups,
+        private readonly string $path,
+        string $prefix,
+        bool $forceDatePrefix,
+        private readonly bool $encrypt
+    ) {
         $this->prefix = $prefix ?: basename($path);
         if ($forceDatePrefix) {
-            $this->datePrefix = '/' . date('Y-m-d');
+            $this->datePrefix = '/' . date('Y-m-d') . ($hasMultipleDailyBackups ? date('-H') : '');
         }
     }
 
     public function get(string $path): string
     {
-        echo "  Downloading $path.\n";
+        $this->logger->info("Downloading $path");
         if (!$this->cache->exists($this->path, $path)) {
-            $data = $this->encrypter->encrypt(file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '', $this->encrypt);
+            $data = $this->encrypter->encrypt(
+                file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '',
+                $this->encrypt
+            );
             $this->cache->save($this->path, $path, $data);
             return $data;
         }
@@ -50,10 +58,10 @@ final class LocalDownloader implements Downloader
 
     public function list(): array
     {
-        echo "Getting objects from source {$this->path}\n";
+        $this->logger->info("Getting objects from source $this->path");
         $output = [];
         $this->scan($this->path, $output);
-        echo "  Found " . count($output) . " objects.\n";
+        $this->logger->info("Found " . count($output) . " objects.");
         return $output;
     }
 }

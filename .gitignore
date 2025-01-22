@@ -2,3 +2,5 @@
 /config.yml
 /cache
 /nbproject
+/.env
+/.idea

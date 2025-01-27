@@ -8,26 +8,22 @@ use De\Idrinth\Duplication\Cache;
 use De\Idrinth\Duplication\Downloader;
 use De\Idrinth\Duplication\Encrypter;
 use De\Idrinth\Duplication\Logger;
+use De\Idrinth\Duplication\Minifier;
 
-final class S3BucketDownloader implements Downloader
+final readonly class S3BucketDownloader implements Downloader
 {
     private S3Client $s3;
-    private string $datePrefix = '';
-    private bool $encrypt;
 
     public function __construct(
         private readonly Logger $logger,
         private readonly Encrypter $encrypter,
         private readonly Cache $cache,
-        bool $hasMultipleDailyBackups,
+        private readonly Minifier $minifier,
         private readonly string $endpoint,
         private readonly string $bucket,
         string $accessKey,
         string $secretAccessKey,
-        bool $forceDatePrefix,
-        bool $encrypt
     ) {
-        $this->encrypt = $encrypt;
         $this->s3 = new S3Client([
             'service' => 's3',
             'region' => 'other',
@@ -44,23 +40,16 @@ final class S3BucketDownloader implements Downloader
                 'verify' => CaBundle::getBundledCaBundlePath(),
             ],
         ]);
-        if ($forceDatePrefix) {
-            $this->datePrefix = date('Y-m-d') . ($hasMultipleDailyBackups ? date('-H') : '') . '/';
-        }
     }
 
     public function get(string $path): string
     {
-        if ($this->datePrefix) {
-            $path = preg_replace('/^' . preg_quote($this->datePrefix, '/') . '/', '', $path);
-        }
         $this->logger->info("Downloading $path.");
         if (!$this->cache->exists($this->endpoint, $path)) {
             $data = $this->encrypter->encrypt(
                 $this->s3->getObject(['Bucket' => $this->bucket, 'Key' => $path])['Body'],
-                $this->encrypt
             );
-            $this->cache->save($this->endpoint, $path, $data);
+            $this->cache->save($this->endpoint, $path, $this->minifier->minify($data));
             return $data;
         }
         return $this->cache->load($this->endpoint, $path);
@@ -81,9 +70,6 @@ final class S3BucketDownloader implements Downloader
         $data = array_filter($data, function ($file) {
             return !str_ends_with($file, '/.') && !str_ends_with($file, '/');
         });
-        $data = array_map(function ($path) {
-            return  $this->datePrefix . $path;
-        }, $data);
         $this->logger->info("Found " . count($data) . " files.");
         return $data;
     }

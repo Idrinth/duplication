@@ -4,7 +4,7 @@ namespace De\Idrinth\Duplication\Logger;
 
 use De\Idrinth\Duplication\LogLevel;
 
-readonly class CLILogger extends AbstractLogger
+final readonly class CLILogger extends AbstractLogger
 {
     protected function writeLog(LogLevel $level, string $message, array $context): void
     {

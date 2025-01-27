@@ -5,27 +5,20 @@ namespace De\Idrinth\Duplication\Downloader;
 use De\Idrinth\Duplication\Cache;
 use De\Idrinth\Duplication\Downloader;
 use De\Idrinth\Duplication\Encrypter;
+use De\Idrinth\Duplication\FileSystem;
 use De\Idrinth\Duplication\Logger;
+use De\Idrinth\Duplication\Minifier;
 
-final class LocalDownloader implements Downloader
+final readonly class LocalDownloader implements Downloader
 {
-    private string $prefix = '';
-    private string $datePrefix = '';
-
     public function __construct(
-        private readonly Logger $logger,
-        private readonly Encrypter $encrypter,
-        private readonly Cache $cache,
-        bool $hasMultipleDailyBackups,
-        private readonly string $path,
-        string $prefix,
-        bool $forceDatePrefix,
-        private readonly bool $encrypt
+        private Logger $logger,
+        private Encrypter $encrypter,
+        private Cache $cache,
+        private Filesystem $filesystem,
+        private Minifier $minifier,
+        private string $path,
     ) {
-        $this->prefix = $prefix ?: basename($path);
-        if ($forceDatePrefix) {
-            $this->datePrefix = '/' . date('Y-m-d') . ($hasMultipleDailyBackups ? date('-H') : '');
-        }
     }
 
     public function get(string $path): string
@@ -33,10 +26,11 @@ final class LocalDownloader implements Downloader
         $this->logger->info("Downloading $path");
         if (!$this->cache->exists($this->path, $path)) {
             $data = $this->encrypter->encrypt(
-                file_get_contents($this->path . preg_replace('/^' . preg_quote($this->prefix . $this->datePrefix, '/') . '/', '', $path)) ?: '',
-                $this->encrypt
+                $this->filesystem->read(
+                    $this->path . $path
+                ),
             );
-            $this->cache->save($this->path, $path, $data);
+            $this->cache->save($this->path, $path, $this->minifier->minify($data));
             return $data;
         }
         return $this->cache->load($this->path, $path);
@@ -47,11 +41,18 @@ final class LocalDownloader implements Downloader
         if (!is_dir($directory)) {
             return;
         }
-        foreach (array_diff(scandir($directory), ['.', '..']) as $file) {
-            if (is_dir($directory . '/' . $file)) {
+        foreach ($this->filesystem->scanDir($directory) as $file) {
+            if ($this->filesystem->isDir($directory . '/' . $file)) {
                 $this->scan($directory . '/' . $file, $output);
             } else {
-                $output[] = $this->prefix . $this->datePrefix . '/' . ltrim(preg_replace('/^' . preg_quote($this->path, '/') . '/', '', $directory . '/' . $file), '/');
+                $output[] = ltrim(
+                    preg_replace(
+                        '/^' . preg_quote($this->path, '/') . '/',
+                        '',
+                        $directory . '/' . $file
+                    ),
+                    '/'
+                );
             }
         }
     }

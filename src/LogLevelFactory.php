@@ -4,7 +4,7 @@ namespace De\Idrinth\Duplication;
 
 use InvalidArgumentException;
 
-class LogLevelFactory
+final readonly class LogLevelFactory
 {
     public function convert($level): LogLevel
     {

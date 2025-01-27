@@ -4,6 +4,7 @@ namespace De\Idrinth\Duplication\Uploader;
 
 use Aws\S3\S3Client;
 use Composer\CaBundle\CaBundle;
+use De\Idrinth\Duplication\DateTimePrefixer;
 use De\Idrinth\Duplication\Logger;
 use De\Idrinth\Duplication\Uploader;
 
@@ -13,8 +14,9 @@ final readonly class S3BucketUploader implements Uploader
 
     public function __construct(
         private Logger $logger,
+        private DateTimePrefixer $dateTimePrefixer,
         private string $bucket,
-        private string $endpoint,
+        string $endpoint,
         string $accessKey,
         string $secretAccessKey
     ) {
@@ -41,24 +43,8 @@ final readonly class S3BucketUploader implements Uploader
        $this->logger->info("Uploading $path.");
        $this->s3->putObject([
             'Bucket' => $this->bucket,
-            'Key' => ltrim($path, '/'),
+            'Key' => ltrim($this->dateTimePrefixer . $path, '/'),
             'Body' => $data,
         ]);
-    }
-
-    public function list(): array
-    {
-        $this->logger->info("Getting objects from target $this->endpoint");
-        $data = array_map(
-            function (array $data) {
-                return ltrim($data['Key'], '/');
-            },
-            $this->s3->listObjectsV2(['Bucket' => $this->bucket])['Contents'] ?? []
-        );
-        $data = array_filter($data, function ($file) {
-            return !str_ends_with($file, '/.') && !str_ends_with($file, '/');
-        });
-        $this->logger->info("Found " . count($data) . " objects.");
-        return $data;
     }
 }

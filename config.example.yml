@@ -10,7 +10,6 @@
     access-key: abcdefghijklmnopqrstuvwxyz
     secret-access-key: 1234567890
 - type: ssh
-  bucket-path: /backups
   user: rotten
   ssh-path: /backups
   host: test-01.idrinth.de

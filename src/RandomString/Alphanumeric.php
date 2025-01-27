@@ -15,14 +15,16 @@ final readonly class Alphanumeric implements RandomString
 
     public function __construct()
     {
-        $this->characters = str_split('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789');
+        $this->characters = str_split(
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+        );
         $this->count = count($this->characters);
     }
 
     public function generate(int $length): string
     {
         if ($length < 1) {
-            throw new InvalidArgumentException("Length must be a positive integer");
+            throw new InvalidArgumentException('Length must be a positive integer');
         }
         $out = '';
         for ($i = 0; $i < $length; $i++) {

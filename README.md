@@ -18,15 +18,14 @@ This will use sftp to connect to a server. This can be used for upload and downl
 
 ```yml
 type: ssh
-bucket-path: /backups
 user: rotten
 ssh-path: /backups
 host: test-01.idrinth.de
 password: abcdefghijklmnopqrstuvwxyz
 private-key: /private/key.pem
 port: 22
-force-date-prefix: false
 encrypt-with-public-key: true
+minify: false
 ```
 #### Write
 ```yml
@@ -37,6 +36,8 @@ ssh-path: /backups
 host: test-01.idrinth.de
 password: abcdefghijklmnopqrstuvwxyz
 private-key: /private/key.pem
+force-date-prefix: false
+prefix: backups
 port: 22
 ```
 
@@ -49,9 +50,8 @@ This will back up from or on the local machine.
 ```yml
 type: local
 path: /backups
-prefix: mine
-force-date-prefix: false
 encrypt-with-public-key: true
+minify: false
 ```
 
 #### Write
@@ -61,6 +61,8 @@ type: local
 path: /backups
 user: backup
 group: backup
+prefix: mine
+force-date-prefix: false
 ```
 
 ### Type Bucket
@@ -75,8 +77,8 @@ endpoint: buckets.idrinth.de/test-01
 bucket: test-01
 access-key: abcdefghijklmnopqrstuvwxyz
 secret-access-key: 1234567890
-force-date-prefix: false
 encrypt-with-public-key: true
+minify: false
 ```
 
 #### Write
@@ -87,6 +89,7 @@ endpoint: buckets.idrinth.de/test-01
 bucket: test-01
 access-key: abcdefghijklmnopqrstuvwxyz
 secret-access-key: 1234567890
+force-date-prefix: false
 ```
 
 ## Support

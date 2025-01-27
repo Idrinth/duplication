@@ -2,10 +2,11 @@
 
 namespace De\Idrinth\Duplication\Command;
 
+use De\Idrinth\Duplication\Command;
 use De\Idrinth\Duplication\Logger;
 use De\Idrinth\Duplication\RandomString;
 
-final readonly class Setup
+final readonly class Setup implements Command
 {
     public function __construct(
         private Logger $logger,

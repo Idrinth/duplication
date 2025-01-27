@@ -5,7 +5,7 @@ namespace De\Idrinth\Duplication\Logger;
 use De\Idrinth\Duplication\Logger;
 use De\Idrinth\Duplication\LogLevel;
 
-readonly class MultiLogger extends AbstractLogger
+final readonly class MultiLogger extends AbstractLogger
 {
     private array $loggers;
     public function __construct(Logger ...$loggers)

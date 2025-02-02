@@ -1,7 +1,8 @@
 <?php
 
-namespace De\Idrinth\Duplication;
+namespace De\Idrinth\Duplication\Factories;
 
+use De\Idrinth\Duplication\LogLevel;
 use InvalidArgumentException;
 
 final readonly class LogLevelFactory

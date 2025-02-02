@@ -12,7 +12,6 @@ use De\Idrinth\Duplication\Logger\CLILogger;
 use De\Idrinth\Duplication\Logger\FileLogger;
 use De\Idrinth\Duplication\Logger\MultiLogger;
 use De\Idrinth\Duplication\LogLevel;
-use De\Idrinth\Duplication\LogLevelFactory;
 use De\Idrinth\Duplication\RandomString\Alphanumeric;
 use Dotenv\Dotenv;
 use InvalidArgumentException;
